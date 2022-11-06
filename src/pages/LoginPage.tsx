@@ -2,6 +2,9 @@ import { useRef, MouseEvent } from 'react';
 import Logo from "../components/Logo";
 import Input from "../components/ui/Input";
 import PageLink from '../components/ui/PageLink';
+import { EmailValidator, RequiredValidator } from '../validators';
+
+const RequiredValidatorInstance = new RequiredValidator('');
 
 const LoginPage = () => {
     const emailRef = useRef<HTMLInputElement>();
@@ -17,18 +20,19 @@ const LoginPage = () => {
                 <fieldset>
                     <legend> Log in </legend>
                     <Logo clickable={false} className='mb-6' />
-                    <Input
+                    <Input<string>
                         innerRef={emailRef}
-                        type='email'
-                        required={true}
                         placeholder="Email"
+                        required={true}
+                        validators={[RequiredValidatorInstance, new EmailValidator()]}
                     />
-                    <Input
+                    <Input<string>
                         innerRef={passwordRef}
                         type='password'
-                        required={true}
                         placeholder="Password"
                         className='my-6'
+                        validators={[RequiredValidatorInstance]}
+                        required={true}
                     />
                     <input
                         type='submit'
