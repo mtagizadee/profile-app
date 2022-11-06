@@ -1,0 +1,33 @@
+@import url(./_fonts.css);
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+    body {
+        @apply font-Poppins;
+    }
+
+    input[type='submit'],
+    button {
+        @apply bg-main py-1 px-8 rounded text-white;
+    }
+
+    form#auth-form {
+        @apply w-full max-w-[400px] flex items-center justify-center;
+    }
+
+    form#auth-form fieldset {
+        @apply w-full flex items-center flex-col py-12 px-8 border-2 border-black rounded;
+    }
+
+    form#auth-form fieldset legend {
+        @apply p-3 font-bold text-xl;
+    }
+
+    form#auth-form fieldset>span {
+        @apply mt-6;
+    }
+}
