@@ -2,9 +2,7 @@ import { useRef, MouseEvent } from 'react';
 import Logo from "../components/Logo";
 import Input from "../components/ui/Input";
 import PageLink from '../components/ui/PageLink';
-import { EmailValidator, ERROR, RequiredValidator } from '../validators';
-
-const RequiredValidatorInstance = new RequiredValidator('');
+import { EmailValidatorInstance, ERROR, RequiredValidatorInstance } from '../validators';
 
 const LoginPage = () => {
     const emailRef = useRef<any>();
@@ -25,7 +23,7 @@ const LoginPage = () => {
                         innerRef={emailRef}
                         placeholder="Email"
                         required={true}
-                        validators={[RequiredValidatorInstance, new EmailValidator()]}
+                        validators={[RequiredValidatorInstance, EmailValidatorInstance]}
                     />
                     <Input<string>
                         innerRef={passwordRef}
