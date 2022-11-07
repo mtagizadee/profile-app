@@ -1,6 +1,6 @@
 import { ChangeEvent, useState, useEffect } from 'react';
 import { ERROR, Validator } from '../../validators';
-import ErrorMark from './ErrorMark';
+import ErrorMark from '../ErrorMark';
 
 interface Props<T> {
     type?: string;

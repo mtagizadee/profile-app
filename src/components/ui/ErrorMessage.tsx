@@ -6,7 +6,7 @@ interface Props {
 
 const ErrorMessage: FC<Props> = ({ children }) => {
     return (
-        <div className='text-main font-bold text-sm'> {children} </div>
+        <div className='text-main font-bold text-sm w-full flex justify-start p-1'> {children} </div>
     );
 }
 
