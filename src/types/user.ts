@@ -1,9 +1,11 @@
+import { Image } from "./image";
+
 export interface IUser {
     id: string;
     firstName: string;
     secondName: string;
     email: string;
-    images: any[];
+    images: Image[];
 }
 
 export class User {

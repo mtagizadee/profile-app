@@ -30,12 +30,14 @@ export const authSlice = createSlice({
         setUser: (state, action: PayloadAction<IUser>) => {
             state.user = new User(action.payload);
         },
+        logOut: (state) => {
+            state = initialState;
+        }
     },
 })
 
-export const { setIsAuth, setUser } = authSlice.actions
+export const { setIsAuth, setUser, logOut } = authSlice.actions
 
-// Other code such as selectors can use the imported `RootState` type
 export const selectIsAuth = (state: RootState) => state.auth.isAuth;
 export const selectUser = (state: RootState) => state.auth.user;
 export default authSlice.reducer;
