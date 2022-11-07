@@ -2,16 +2,17 @@ import { useRef, MouseEvent } from 'react';
 import Logo from "../components/Logo";
 import Input from "../components/ui/Input";
 import PageLink from '../components/ui/PageLink';
-import { EmailValidator, RequiredValidator } from '../validators';
+import { EmailValidator, ERROR, RequiredValidator } from '../validators';
 
 const RequiredValidatorInstance = new RequiredValidator('');
 
 const LoginPage = () => {
-    const emailRef = useRef<HTMLInputElement>();
-    const passwordRef = useRef<HTMLInputElement>();
+    const emailRef = useRef<any>();
+    const passwordRef = useRef<any>();
 
     const onSubmit = (e: MouseEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (emailRef.current[ERROR] || passwordRef.current[ERROR]) return;
     }
 
     return (

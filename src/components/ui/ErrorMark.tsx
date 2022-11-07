@@ -8,7 +8,7 @@ const ErrorMark: FC<Props> = ({ errorMessage }) => {
     return (
         <div title={errorMessage}>
             <svg
-                className='absolute -right-6 bottom-3'
+                className='absolute -right-6 bottom-3 hover:cursor-pointer'
                 width="18"
                 height="18"
                 viewBox="0 0 18 18"

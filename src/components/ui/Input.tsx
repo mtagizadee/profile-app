@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState, useEffect } from 'react';
 import { ERROR, Validator } from '../../validators';
 import ErrorMark from './ErrorMark';
 
@@ -12,7 +12,7 @@ interface Props<T> {
 }
 
 function Input<T>({ innerRef, required = false, type = 'text', placeholder, className, validators = [] }: Props<T>) {
-    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [errorMessage, setErrorMessage] = useState<string>(required ? 'This field must be not empty...' : '');
     const [error, setError] = useState<boolean>(!required);
 
     const validate = (value: T) => {
@@ -20,9 +20,12 @@ function Input<T>({ innerRef, required = false, type = 'text', placeholder, clas
             validators.forEach((validator: Validator<T>) => {
                 const validated = validator.validate(value);
                 setError(validated);
+
                 if (!validated) {
                     setErrorMessage(validator.getErrorMessage());
                 }
+
+                setFormError(!validated);
             })
         }
     }
@@ -31,6 +34,15 @@ function Input<T>({ innerRef, required = false, type = 'text', placeholder, clas
         const value = e.target.value as T;
         validate(value);
     }
+
+    const setFormError = (value: boolean) => {
+        innerRef.current[ERROR] = value;
+    }
+
+    useEffect(() => {
+        setFormError(required);
+    }, []);
+
 
     return (
         <div className={`w-full ${className} relative`}>
