@@ -7,7 +7,8 @@ import Logo from "../components/Logo";
 import ErrorMessage from "../components/ui/ErrorMessage";
 import Input from "../components/ui/Input";
 import PageLink from "../components/ui/PageLink";
-import { signup } from "../api/signup";
+import { signup } from "../api";
+import { NavigateFunction, useNavigate } from "react-router";
 
 const SignupPage = () => {
     const [error, setError] = useState<number>(0);
@@ -17,6 +18,7 @@ const SignupPage = () => {
     const firstNameRef = useRef<any>();
     const secondNameRef = useRef<any>();
     const dispatch = useAppDispatch();
+    const navigate: NavigateFunction = useNavigate();
 
     const onSubmit = async (e: MouseEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -44,6 +46,7 @@ const SignupPage = () => {
             dispatch(show())
             dispatch(setMessage('Successfully signed up!'));
             setError(0);
+            navigate('/');
         } catch (error) {
             if (error instanceof AxiosError) {
                 const status = error.response?.status;

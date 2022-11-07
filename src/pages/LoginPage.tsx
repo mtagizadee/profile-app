@@ -9,12 +9,14 @@ import { login } from '../api';
 import { AxiosError } from 'axios';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { setMessage, show } from '../redux/slices/alertSlice';
+import { NavigateFunction, useNavigate } from 'react-router';
 
 const LoginPage = () => {
     const [error, setError] = useState<number>(0);
     const emailRef = useRef<any>();
     const passwordRef = useRef<any>();
     const dispatch = useAppDispatch();
+    const navigate: NavigateFunction = useNavigate();
 
     const onSubmit = async (e: MouseEvent<HTMLFormElement>) => {
         e.preventDefault();
