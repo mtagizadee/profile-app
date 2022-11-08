@@ -1,17 +1,30 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useAppSelector } from "./redux/hooks";
-import { selectIsAuth } from "./redux/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "./redux/hooks";
+import { logOut, selectIsAuth, setIsAuth } from "./redux/slices/authSlice";
 import AlertMessage from "./components/AlertMessage";
 import { privateRoutes, publicRoutes } from "./routes";
 import ErrorPage from "./pages/ErrorPage";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { useEffect, useState } from "react";
+import { addRequestInterceptors, addResponseInterceptors } from "./helpers";
+import Loader from "./components/Loader";
 
 const queryClient = new QueryClient()
 
 const App = () => {
+  const [isAxiosLoading, setIsAxiosLoading] = useState(true);
+
   const isAuth = useAppSelector(selectIsAuth);
   const routes = isAuth ? privateRoutes : publicRoutes;
+  const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    addRequestInterceptors();
+    addResponseInterceptors(() => dispatch(logOut()));
+    setIsAxiosLoading(false);
+  }, []);
+
+  if (isAxiosLoading) return <Loader />
 
   return (
     <QueryClientProvider client={queryClient}>
