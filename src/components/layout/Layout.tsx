@@ -10,7 +10,7 @@ const Layout: FC<Props> = ({ children }) => {
         <div>
             <Header />
             <main className="flex justify-center">
-                <div className="w-full max-w-main p-6 mt-28">
+                <div className="w-full max-w-main p-3 sm:p-6 mt-28">
                     {children}
                 </div>
             </main>

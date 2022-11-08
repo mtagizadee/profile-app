@@ -14,7 +14,7 @@ const ProfileIcon: FC<Props> = ({ imageUrl, navigateTo }) => {
     return (
         <div
             onClick={() => navigate(navigateTo)}
-            className='w-[70px] h-[70px] bg-gray-200 bg-cover bg-center bg-no-repeat rounded-full hover:cursor-pointer'
+            className='w-[70px] h-[70px] bg-loading bg-cover bg-center bg-no-repeat rounded-full hover:cursor-pointer'
             style={{ backgroundImage: `url(${API_BASE_URL + `/${imageUrl}`})` }}
         />
     );
