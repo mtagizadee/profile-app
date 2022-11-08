@@ -10,6 +10,7 @@ import { AxiosError } from 'axios';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { setMessage, show } from '../redux/slices/alertSlice';
 import { NavigateFunction, useNavigate } from 'react-router';
+import { ACCESS_TOKEN_KEY } from '../api';
 
 const LoginPage = () => {
     const [error, setError] = useState<number>(0);
@@ -28,7 +29,7 @@ const LoginPage = () => {
             });
 
             dispatch(setIsAuth(true));
-            localStorage.setItem('access_token', accessToken.access_token);
+            localStorage.setItem(ACCESS_TOKEN_KEY, accessToken.access_token);
             setError(0);
         } catch (error) {
             if (error instanceof AxiosError) {

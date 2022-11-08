@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { ACCESS_TOKEN_KEY } from '../../api';
 import type { RootState } from '../store'
 
 interface AuthSlice {
@@ -6,7 +7,7 @@ interface AuthSlice {
 }
 
 const initialState: AuthSlice = {
-    isAuth: false
+    isAuth: localStorage.getItem(ACCESS_TOKEN_KEY) !== null
 }
 
 export const authSlice = createSlice({

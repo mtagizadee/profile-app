@@ -66,7 +66,7 @@ const SignupPage = () => {
         <div className="flex items-center justify-center h-screen">
             <form onSubmit={onSubmit} id="auth-form">
                 <fieldset>
-                    <legend> Log in </legend>
+                    <legend> Sign up </legend>
                     <Logo clickable={false} className='mb-6' />
                     <Input<string>
                         innerRef={firstNameRef}
