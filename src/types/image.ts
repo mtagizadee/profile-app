@@ -13,7 +13,15 @@ export class Image {
         this.data = data;
     }
 
-    getUrl = () => this.data.url;
+    getUrl() {
+        return this.data.url;
+    }
 
-    getId = () => this.data.id;
+    getId() {
+        return this.data.id;
+    }
+
+    getType() {
+        return this.data.type;
+    }
 }

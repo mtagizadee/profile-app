@@ -1,23 +1,47 @@
-import { Image } from "./image";
+import { IImage, Image } from "./image";
 
 export interface IUser {
     id: string;
     firstName: string;
     secondName: string;
     email: string;
-    images: Image[];
+    images: IImage[];
 }
 
 export class User {
-    private data: IUser;
+    private data: {
+        id: string,
+        firstName: string,
+        secondName: string,
+        email: string,
+        images: Image[]
+    };
 
     constructor(data: IUser) {
-        this.data = data;
+        const images = data.images.map(image => new Image(image));
+        this.data = { ...data, images }
     }
 
-    getFullName = () => `${this.data.firstName} ${this.data.secondName}`
+    getFullName() {
+        return `${this.data.firstName} ${this.data.secondName}`
+    }
 
-    getImages = () => this.data.images;
+    getId() {
+        return this.data.id;
+    }
 
-    getId = () => this.data.id;
+    getHeaderImage() {
+        const images = this.data.images;
+        return images.find(image => image.getType() == 'header');
+    }
+
+    getAvatar() {
+        const images = this.data.images;
+        return images.find(image => image.getType() == 'avatar');
+    }
+
+    getImages() {
+        const images = this.data.images;
+        return images.filter(image => image.getType() == 'image');
+    }
 }

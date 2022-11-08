@@ -9,7 +9,6 @@ import { login } from '../api';
 import { AxiosError } from 'axios';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { setMessage, show } from '../redux/slices/alertSlice';
-import { NavigateFunction, useNavigate } from 'react-router';
 import { ACCESS_TOKEN_KEY } from '../api';
 
 const LoginPage = () => {
@@ -17,7 +16,6 @@ const LoginPage = () => {
     const emailRef = useRef<any>();
     const passwordRef = useRef<any>();
     const dispatch = useAppDispatch();
-    const navigate: NavigateFunction = useNavigate();
 
     const onSubmit = async (e: MouseEvent<HTMLFormElement>) => {
         e.preventDefault();

@@ -3,6 +3,6 @@ import LoginPage from '../pages/LoginPage';
 import SignupPage from '../pages/SignupPage';
 
 export const publicRoutes: Route[] = [
-    { path: '/', element: LoginPage },
-    { path: '/signup', element: SignupPage }
+    { id: 1, path: '/', element: LoginPage },
+    { id: 2, path: '/signup', element: SignupPage }
 ]
