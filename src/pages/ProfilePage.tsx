@@ -6,18 +6,19 @@ import Layout from '../components/layout/Layout';
 import Loader from '../components/Loader';
 import { User } from '../types';
 import Error from '../components/Error';
-import useFileUpload from '../hooks/useFileUpload';
 import CameraIcon from '../components/icons/CameraIcon';
 import { updateImage } from '../api/updateImage';
 import { createHeader } from '../api/createHeader';
 import { useAppDispatch } from '../redux/hooks';
 import { setMessage, show } from '../redux/slices/alertSlice';
+import FileInput from '../components/FileInput';
+import useHover from '../hooks/useHover';
 
-type UserContextType = {
+type TUserContext = {
     user: User | undefined,
     isModifiable: boolean
 } | undefined;
-const UserContext = createContext<UserContextType>(undefined);
+const UserContext = createContext<TUserContext>(undefined);
 
 const ProfilePage = () => {
     const { data, isLoading, isError } = useQuery('current-user', getCurrentUser);
@@ -65,20 +66,6 @@ const ProfileHeader = () => {
         }
     })
 
-    const ref = useRef<HTMLInputElement>(null);
-    const [onButtonClick, onFileChange] = useFileUpload(
-        ref,
-        ['jpg', 'png', 'jpeg'],
-        (file: File) => {
-            if (header) {
-                updateMutation.mutate({ image: file, id: header?.getId() })
-                return;
-            }
-
-            createMutation.mutate({ header: file });
-        }
-    );
-
     return (
         <div className='relative'>
             <div
@@ -86,21 +73,25 @@ const ProfileHeader = () => {
                 style={header ? { backgroundImage: `url(${API_BASE_URL + `/${header?.getUrl()}`})` } : {}}
             />
             {data?.isModifiable ?
-                <>
-                    <div onClick={onButtonClick} className='absolute right-3 bottom-3 cursor-pointer'>
-                        <CameraIcon
-                            color={header ? 'white' : 'black'}
-                            scale='0.8'
-                        />
-                    </div>
-                    <input
-                        onChange={onFileChange}
-                        ref={ref}
-                        accept='.jpg, .png, .jpeg'
-                        type="file"
-                        className='hidden'
+                <FileInput
+                    validatedExtensions={['jpg', 'png', 'jpeg']}
+                    className='absolute right-3 bottom-3 cursor-pointer'
+                    onSuccess={
+                        (file: File) => {
+                            if (header) {
+                                updateMutation.mutate({ image: file, id: header?.getId() })
+                                return;
+                            }
+
+                            createMutation.mutate({ header: file });
+                        }
+                    }
+                >
+                    <CameraIcon
+                        color={header ? 'white' : 'black'}
+                        scale='0.8'
                     />
-                </>
+                </FileInput>
                 : null
             }
         </div>
@@ -108,15 +99,32 @@ const ProfileHeader = () => {
 }
 
 const ProfileInfo = () => {
+    const [hover, onMouseEnter, onMouseLeave] = useHover();
     const data = useContext(UserContext);
     const avatar = data?.user?.getAvatar();
 
     return (
         <div className='flex items-center gap-12 text-xl font-bold'>
             <div
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
                 className='w-full h-screen max-w-[140px] min-w-[120px] max-h-[140px] min-h-[120px] relative bottom-12 left-12 bg-loading rounded-full bg-cover bg-center'
                 style={avatar ? { backgroundImage: `url(${API_BASE_URL + `/${avatar?.getUrl()}`})` } : {}}
-            />
+            >
+                {data?.isModifiable ?
+                    <FileInput
+                        onSuccess={(file: File) => { console.log(file) }}
+                        validatedExtensions={['jpg', 'png', 'jpeg']}
+                    >
+                        {hover ?
+                            <div className='bg-black w-full h-full absolute top-0 rounded-full flex items-center justify-center bg-opacity-30 cursor-pointer'>
+                                <CameraIcon color='white' />
+                            </div> : null
+                        }
+                    </FileInput>
+                    : null
+                }
+            </div>
             <span> {data?.user?.getFullName()} </span>
         </div>
     )
