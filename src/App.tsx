@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { logOut, selectIsAuth, setIsAuth } from "./redux/slices/authSlice";
 import AlertMessage from "./components/AlertMessage";
@@ -36,7 +36,8 @@ const App = () => {
             element={<route.element />}
             key={route.id}
           />)}
-          <Route path="*" element={<ErrorPage />} />
+          <Route path="/error" element={<ErrorPage />} />
+          <Route path="*" element={<Navigate to='/error' />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

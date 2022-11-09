@@ -44,4 +44,12 @@ export class User {
         const images = this.data.images;
         return images.filter(image => image.getType() == 'image');
     }
+
+    deleteHeader() {
+        this.data.images = this.data.images.filter(image => image.getType() != 'header');
+    }
+
+    addHeader(header: IImage) {
+        this.data.images.push(new Image(header));
+    }
 }
