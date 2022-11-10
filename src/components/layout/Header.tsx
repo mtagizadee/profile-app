@@ -1,15 +1,15 @@
 import Logo from "../Logo";
 import { useQuery } from 'react-query';
-import getCurrentUser from "../../api/get-current-user";
+import { getCurrentUser } from "../../api";
 import ProfileIcon from "../ProfileIcon";
 import PageLink from "../ui/PageLink";
 import HomeIcon from "../icons/HomeIcon";
 
 const Header = () => {
-    const { data, isLoading, isError, error } = useQuery('current-user', getCurrentUser);
+    const { data, isLoading } = useQuery('current-user', getCurrentUser);
 
     return (
-        <header className="fixed w-full top-0 bg-white z-50 flex justify-center items-center border-black border-b-2">
+        <header className="fixed w-full top-0 bg-white z-40 flex justify-center items-center border-black border-b-2">
             <div className="w-full max-w-main p-6 flex justify-between items-center">
                 <Logo />
                 <div className="flex items-center gap-6">

@@ -49,15 +49,15 @@ export class User {
         this.data.images = this.data.images.filter(image => image.getType() != 'header');
     }
 
-    addHeader(header: IImage) {
-        this.data.images.push(new Image(header));
-    }
-
     deleteAvatar() {
         this.data.images = this.data.images.filter(image => image.getType() != 'avatar');
     }
 
-    addAvatar(avatar: IImage) {
-        this.data.images.push(new Image(avatar));
+    deleteImage(target: Image) {
+        this.data.images = this.data.images.filter(image => image.getId() != target.getId());
+    }
+
+    addImage(image: IImage) {
+        this.data.images.push(new Image(image));
     }
 }

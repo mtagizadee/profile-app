@@ -2,6 +2,10 @@
     animation: alert-message-animation 6s ease forwards;
 }
 
+.modal {
+    animation: modal-animation 0.2s ease-in-out forwards;
+}
+
 @keyframes alert-message-animation {
     0% {
         bottom: -20%;
@@ -17,5 +21,17 @@
 
     100% {
         bottom: -20%;
+    }
+}
+
+@keyframes modal-animation {
+    from {
+        margin-top: 3em;
+        opacity: 0;
+    }
+
+    to {
+        margin-top: 0;
+        opacity: 1;
     }
 }

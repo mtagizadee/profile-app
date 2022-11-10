@@ -1,14 +1,15 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, FC, ReactNode, MouseEvent, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import { API_BASE_URL, createAvatar, updateImage, createHeader } from '../api';
-import getCurrentUser from '../api/get-current-user';
+import { API_BASE_URL, createAvatar, updateImage, createHeader, getCurrentUser, deleteImage } from '../api';
+import { Image, User } from '../types';
+import { setMessage, show } from '../redux/slices/alertSlice';
+import { useAppDispatch } from '../redux/hooks';
+import Modal from '../components/Modal';
+import SettingsIcon from '../components/icons/SettingsIcon';
 import Layout from '../components/layout/Layout';
 import Loader from '../components/Loader';
-import { User } from '../types';
 import Error from '../components/Error';
 import CameraIcon from '../components/icons/CameraIcon';
-import { useAppDispatch } from '../redux/hooks';
-import { setMessage, show } from '../redux/slices/alertSlice';
 import FileInput from '../components/FileInput';
 import useHover from '../hooks/useHover';
 
@@ -47,7 +48,7 @@ const ProfileHeader = () => {
     const updateMutation = useMutation(updateImage, {
         onSuccess: variables => {
             data?.user?.deleteHeader();
-            data?.user?.addHeader(variables);
+            data?.user?.addImage(variables);
         },
         onError: () => {
             dispatch(show());
@@ -56,7 +57,7 @@ const ProfileHeader = () => {
     });
     const createMutation = useMutation(createHeader, {
         onSuccess: variables => {
-            data?.user?.addHeader(variables);
+            data?.user?.addImage(variables);
         },
         onError: () => {
             dispatch(show());
@@ -105,7 +106,7 @@ const ProfileInfo = () => {
     const updateMutation = useMutation(updateImage, {
         onSuccess: variables => {
             data?.user?.deleteAvatar()
-            data?.user?.addAvatar(variables);
+            data?.user?.addImage(variables);
         },
         onError: () => {
             dispatch(show());
@@ -115,7 +116,7 @@ const ProfileInfo = () => {
 
     const createMutation = useMutation(createAvatar, {
         onSuccess: variables => {
-            data?.user?.addAvatar(variables);
+            data?.user?.addImage(variables);
         },
         onError: () => {
             dispatch(show())
@@ -144,10 +145,9 @@ const ProfileInfo = () => {
                         validatedExtensions={['jpg', 'png', 'jpeg']}
                     >
                         {hover ?
-                            <div className='bg-black w-full h-full absolute top-0 rounded-full flex items-center justify-center bg-opacity-30 cursor-pointer'>
+                            <IconOnImage rounded={true} >
                                 <CameraIcon color='white' />
-                            </div> : null
-                        }
+                            </IconOnImage> : null}
                     </FileInput>
                     : null
                 }
@@ -169,16 +169,117 @@ const ProfileImages = () => {
                     {images?.length != 0 ?
                         images?.map(image =>
                             <div key={image.getId()} className='w-full flex justify-center items-center'>
-                                <div
-                                    className='bg-loading bg-cover bg-center w-[250px] h-[250px]'
-                                    style={{ backgroundImage: `url(${API_BASE_URL + `/${image.getUrl()}`})` }}
-                                />
+                                <ProfileImage image={image} data={data} />
                             </div>
                         ) : null
                     }
                 </div>
             </div>
         </div>
+    )
+}
+
+interface CameraIconProps {
+    rounded?: boolean;
+    children: ReactNode;
+    onClick?: (e: MouseEvent<HTMLDivElement>) => void;
+}
+
+const IconOnImage: FC<CameraIconProps> = ({ rounded = false, children, onClick }) => {
+    return (
+        <div
+            onClick={onClick}
+            style={{ borderRadius: rounded ? '50%' : '0' }}
+            className='bg-black w-full h-full absolute top-0 flex items-center justify-center bg-opacity-30 cursor-pointer'
+        >
+            {children}
+        </div>
+    )
+}
+
+interface ProfileImageProps {
+    data: TUserContext;
+    image: Image;
+}
+
+const ProfileImage: FC<ProfileImageProps> = ({ image }) => {
+    const data = useContext(UserContext);
+    const images = data?.user?.getImages();
+    const [hover, onMouseEnter, onMouseLeave] = useHover();
+    const [optionModal, setOptionModal] = useState<boolean>(false);
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
+
+    const dispatch = useAppDispatch();
+
+    const updateMutation = useMutation(updateImage, {
+        onSuccess: variables => {
+            data?.user?.deleteImage(image);
+            data?.user?.addImage(variables);
+        },
+        onError: () => {
+            dispatch(show());
+            dispatch(setMessage('Could not update the image...'));
+        }
+    });
+    const deleteMutation = useMutation(deleteImage, {
+        onSuccess: () => {
+            data?.user?.deleteImage(image);
+            setDeleteModal(false);
+        },
+        onError: () => {
+            dispatch(show());
+            dispatch(setMessage('Could not delete the image'));
+        }
+    });
+
+
+    return (
+        <>
+            <Modal onClose={() => setOptionModal(false)} visible={optionModal}>
+                <div className='bg-white p-6 rounded'>
+                    <div className='pb-3 text-center text-xl'> Choose an option. </div>
+                    <div className='flex items-center gap-6'>
+                        <FileInput
+                            onSuccess={(file: File) => {
+                                setOptionModal(false);
+                                updateMutation.mutate({ image: file, id: image.getId() });
+                            }}
+                            validatedExtensions={['jpg', 'png', 'jpeg']}
+                        >
+                            <button> Update </button>
+                        </FileInput>
+                        <button onClick={() => {
+                            setOptionModal(false);
+                            setDeleteModal(true);
+                        }}> Delete </button>
+                    </div>
+                </div>
+            </Modal>
+            <Modal onClose={() => setDeleteModal(false)} visible={deleteModal}>
+                <div className='bg-white p-6 rounded'>
+                    <div className='pb-3 text-center text-xl'> Are you sure? </div>
+                    <div className='flex items-center gap-6'>
+                        <button onClick={() => deleteMutation.mutate({ id: image.getId() })}> Yes </button>
+                        <button onClick={() => setDeleteModal(false)}> No </button>
+                    </div>
+                </div>
+            </Modal>
+            <div
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
+                className='bg-loading bg-cover bg-center w-[250px] h-[250px] relative'
+                style={{ backgroundImage: `url(${API_BASE_URL + `/${images?.find(elem => elem.getId() == image.getId())?.getUrl()}`})` }}
+            >
+                {data?.isModifiable ?
+                    <>
+                        {hover ?
+                            <IconOnImage onClick={() => setOptionModal(true)}>
+                                <SettingsIcon color="white" />
+                            </IconOnImage> : null}
+                    </> : null
+                }
+            </div>
+        </>
     )
 }
 
