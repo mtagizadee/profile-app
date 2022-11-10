@@ -32,7 +32,7 @@ const useFileUpload = (
         onSuccess(file);
     }
 
-    return [onButtonClick, onFileChange] as any[];
+    return [onButtonClick, onFileChange] as [() => void, (e: ChangeEvent<HTMLInputElement>) => void];
 }
 
 

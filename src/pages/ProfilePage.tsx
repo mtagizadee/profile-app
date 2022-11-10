@@ -1,14 +1,12 @@
-import { createContext, useContext, useRef } from 'react';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { API_BASE_URL } from '../api';
+import { createContext, useContext } from 'react';
+import { useMutation, useQuery } from 'react-query';
+import { API_BASE_URL, createAvatar, updateImage, createHeader } from '../api';
 import getCurrentUser from '../api/get-current-user';
 import Layout from '../components/layout/Layout';
 import Loader from '../components/Loader';
 import { User } from '../types';
 import Error from '../components/Error';
 import CameraIcon from '../components/icons/CameraIcon';
-import { updateImage } from '../api/updateImage';
-import { createHeader } from '../api/createHeader';
 import { useAppDispatch } from '../redux/hooks';
 import { setMessage, show } from '../redux/slices/alertSlice';
 import FileInput from '../components/FileInput';
@@ -49,7 +47,7 @@ const ProfileHeader = () => {
     const updateMutation = useMutation(updateImage, {
         onSuccess: variables => {
             data?.user?.deleteHeader();
-            data?.user?.addHeader(variables as any);
+            data?.user?.addHeader(variables);
         },
         onError: () => {
             dispatch(show());
@@ -58,7 +56,7 @@ const ProfileHeader = () => {
     });
     const createMutation = useMutation(createHeader, {
         onSuccess: variables => {
-            data?.user?.addHeader(variables as any);
+            data?.user?.addHeader(variables);
         },
         onError: () => {
             dispatch(show());
@@ -99,9 +97,31 @@ const ProfileHeader = () => {
 }
 
 const ProfileInfo = () => {
+    const dispatch = useAppDispatch();
     const [hover, onMouseEnter, onMouseLeave] = useHover();
     const data = useContext(UserContext);
     const avatar = data?.user?.getAvatar();
+
+    const updateMutation = useMutation(updateImage, {
+        onSuccess: variables => {
+            data?.user?.deleteAvatar()
+            data?.user?.addAvatar(variables);
+        },
+        onError: () => {
+            dispatch(show());
+            dispatch(setMessage('Could not update profile image'));
+        }
+    });
+
+    const createMutation = useMutation(createAvatar, {
+        onSuccess: variables => {
+            data?.user?.addAvatar(variables);
+        },
+        onError: () => {
+            dispatch(show())
+            dispatch(setMessage('Could not create a profile image'));
+        }
+    });
 
     return (
         <div className='flex items-center gap-12 text-xl font-bold'>
@@ -113,7 +133,14 @@ const ProfileInfo = () => {
             >
                 {data?.isModifiable ?
                     <FileInput
-                        onSuccess={(file: File) => { console.log(file) }}
+                        onSuccess={(file: File) => {
+                            if (avatar) {
+                                updateMutation.mutate({ image: file, id: avatar.getId() });
+                                return;
+                            }
+
+                            createMutation.mutate({ avatar: file });
+                        }}
                         validatedExtensions={['jpg', 'png', 'jpeg']}
                     >
                         {hover ?

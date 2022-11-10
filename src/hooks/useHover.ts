@@ -11,7 +11,7 @@ const useHover = () => {
         setHover(false);
     }
 
-    return [hover, onMouseEnter, onMouseLeave] as any;
+    return [hover, onMouseEnter, onMouseLeave] as [boolean, () => void, () => void];
 }
 
 export default useHover;

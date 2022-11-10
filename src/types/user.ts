@@ -52,4 +52,12 @@ export class User {
     addHeader(header: IImage) {
         this.data.images.push(new Image(header));
     }
+
+    deleteAvatar() {
+        this.data.images = this.data.images.filter(image => image.getType() != 'avatar');
+    }
+
+    addAvatar(avatar: IImage) {
+        this.data.images.push(new Image(avatar));
+    }
 }
