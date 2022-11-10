@@ -1,6 +1,6 @@
 import { createContext, useContext, FC, ReactNode, MouseEvent, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import { API_BASE_URL, createAvatar, updateImage, createHeader, getCurrentUser, deleteImage } from '../api';
+import { API_BASE_URL, createAvatar, updateImage, createHeader, getCurrentUser, deleteImage, createImage } from '../api';
 import { Image, User } from '../types';
 import { setMessage, show } from '../redux/slices/alertSlice';
 import { useAppDispatch } from '../redux/hooks';
@@ -159,12 +159,30 @@ const ProfileInfo = () => {
 
 const ProfileImages = () => {
     const data = useContext(UserContext);
+    const dispatch = useAppDispatch();
     const images = data?.user?.getImages();
+
+    const mutation = useMutation(createImage, {
+        onSuccess: (variables) => {
+            data?.user?.addImage(variables);
+        },
+        onError: () => {
+            dispatch(show());
+            dispatch(setMessage('Could not create the image...'));
+        }
+    })
 
     return (
         <div className='w-full flex justify-center'>
-            <div className='w-full max-w-[800px]'>
+            <div className='w-full max-w-[800px] relative'>
                 <hr className='border-black' />
+                {data?.isModifiable ?
+                    <FileInput
+                        onSuccess={(file: File) => mutation.mutate({ image: file })}
+                        validatedExtensions={['jpg', 'png', 'jpeg']}
+                    >
+                        <button className='absolute right-0 -top-12'> Add Image </button>
+                    </FileInput> : null}
                 <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 p-2'>
                     {images?.length != 0 ?
                         images?.map(image =>

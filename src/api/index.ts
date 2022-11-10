@@ -6,3 +6,4 @@ export * from './updateImage';
 export * from './getCurrentUser';
 export * from './createHeader';
 export * from './deleteImage';
+export * from './createImage';
