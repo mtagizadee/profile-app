@@ -7,3 +7,6 @@ export * from './getCurrentUser';
 export * from './createHeader';
 export * from './deleteImage';
 export * from './createImage';
+export * from './updateUser';
+export * from './deleteUser';
+export * from './getUser';

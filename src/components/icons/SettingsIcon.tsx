@@ -3,15 +3,17 @@ import { FC } from 'react';
 interface Props {
     color: string;
     scale?: string;
+    className?: string;
 }
 
-const SettingsIcon: FC<Props> = ({ color, scale }) => {
+const SettingsIcon: FC<Props> = ({ color, scale, className }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             height="48"
             width="48"
             style={{ scale }}
+            className={className}
         >
             <path
                 fill={color}

@@ -1,6 +1,6 @@
 import { createContext, useContext, FC, ReactNode, MouseEvent, useState } from 'react';
-import { useMutation, useQuery } from 'react-query';
-import { API_BASE_URL, createAvatar, updateImage, createHeader, getCurrentUser, deleteImage, createImage } from '../api';
+import { isError, useMutation, useQuery } from 'react-query';
+import { API_BASE_URL, createAvatar, updateImage, createHeader, getCurrentUser, deleteImage, createImage, getUser } from '../api';
 import { Image, User } from '../types';
 import { setMessage, show } from '../redux/slices/alertSlice';
 import { useAppDispatch } from '../redux/hooks';
@@ -8,10 +8,13 @@ import Modal from '../components/Modal';
 import SettingsIcon from '../components/icons/SettingsIcon';
 import Layout from '../components/layout/Layout';
 import Loader from '../components/Loader';
-import Error from '../components/Error';
+import ErrorOccuredPage from '../components/Error';
 import CameraIcon from '../components/icons/CameraIcon';
 import FileInput from '../components/FileInput';
 import useHover from '../hooks/useHover';
+import PageLink from '../components/ui/PageLink';
+import { Navigate, useParams } from 'react-router';
+import { AxiosError } from 'axios';
 
 type TUserContext = {
     user: User | undefined,
@@ -22,7 +25,8 @@ const UserContext = createContext<TUserContext>(undefined);
 const ProfilePage = () => {
     const { data, isLoading, isError } = useQuery('current-user', getCurrentUser);
     if (isLoading) return <Loader />
-    if (isError) return <Error />
+    if (isError) return <ErrorOccuredPage
+    />
 
     return (
         <Layout>
@@ -38,6 +42,33 @@ const ProfilePage = () => {
             </UserContext.Provider>
         </Layout>
     );
+}
+
+export const OtherUserPage = () => {
+    const { id } = useParams();
+    const { data, isLoading, error, isError } = useQuery(['user', id], () => getUser(id as string), {
+        retry: 0
+    });
+
+    if (isLoading) return <Loader />
+    if ((error instanceof Error && error.name == '404') || isError) {
+        return <Navigate to='/error' />
+    }
+
+    return (
+        <Layout>
+            <UserContext.Provider
+                value={{
+                    user: data,
+                    isModifiable: false
+                }}
+            >
+                <ProfileHeader />
+                <ProfileInfo />
+                <ProfileImages />
+            </UserContext.Provider>
+        </Layout>
+    )
 }
 
 const ProfileHeader = () => {
@@ -103,7 +134,7 @@ const ProfileInfo = () => {
     const data = useContext(UserContext);
     const avatar = data?.user?.getAvatar();
 
-    const updateMutation = useMutation(updateImage, {
+    const updateAvatarMutation = useMutation(updateImage, {
         onSuccess: variables => {
             data?.user?.deleteAvatar()
             data?.user?.addImage(variables);
@@ -114,7 +145,7 @@ const ProfileInfo = () => {
         }
     });
 
-    const createMutation = useMutation(createAvatar, {
+    const createAvatarMutation = useMutation(createAvatar, {
         onSuccess: variables => {
             data?.user?.addImage(variables);
         },
@@ -136,11 +167,11 @@ const ProfileInfo = () => {
                     <FileInput
                         onSuccess={(file: File) => {
                             if (avatar) {
-                                updateMutation.mutate({ image: file, id: avatar.getId() });
+                                updateAvatarMutation.mutate({ image: file, id: avatar.getId() });
                                 return;
                             }
 
-                            createMutation.mutate({ avatar: file });
+                            createAvatarMutation.mutate({ avatar: file });
                         }}
                         validatedExtensions={['jpg', 'png', 'jpeg']}
                     >
@@ -152,7 +183,13 @@ const ProfileInfo = () => {
                     : null
                 }
             </div>
-            <span> {data?.user?.getFullName()} </span>
+            <div className='flex items-center'>
+                <span className='text-[1rem] sm:text-[1.3rem]'> {data?.user?.getFullName()} </span>
+                {data?.isModifiable ?
+                    <PageLink to='/profile/edit'>
+                        <SettingsIcon className='cursor-pointer' color='black' scale='0.6' />
+                    </PageLink> : null}
+            </div>
         </div>
     )
 }
@@ -181,7 +218,7 @@ const ProfileImages = () => {
                         onSuccess={(file: File) => mutation.mutate({ image: file })}
                         validatedExtensions={['jpg', 'png', 'jpeg']}
                     >
-                        <button className='absolute right-0 -top-12'> Add Image </button>
+                        <button className='absolute right-0 -top-9'> Add Image </button>
                     </FileInput> : null}
                 <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 p-2'>
                     {images?.length != 0 ?

@@ -20,6 +20,7 @@ const LoginPage = () => {
     const onSubmit = async (e: MouseEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (emailRef.current[ERROR] || passwordRef.current[ERROR]) return;
+
         try {
             const accessToken = await login({
                 email: emailRef.current.value,
