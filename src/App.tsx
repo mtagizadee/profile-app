@@ -6,7 +6,7 @@ import { privateRoutes, publicRoutes } from "./routes";
 import ErrorPage from "./pages/ErrorPage";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { useEffect, useState } from "react";
-import { addRequestInterceptors, addResponseInterceptors } from "./helpers";
+import { addRequestInterceptors } from "./helpers";
 import Loader from "./components/Loader";
 
 const queryClient = new QueryClient()
@@ -16,11 +16,9 @@ const App = () => {
 
   const isAuth = useAppSelector(selectIsAuth);
   const routes = isAuth ? privateRoutes : publicRoutes;
-  const dispatch = useAppDispatch();
 
   useEffect(() => {
     addRequestInterceptors();
-    // addResponseInterceptors(() => dispatch(logOut()));
     setIsAxiosLoading(false);
   }, []);
 

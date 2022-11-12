@@ -16,18 +16,3 @@ export const addRequestInterceptors = () => {
         }
     );
 }
-
-export const addResponseInterceptors = (callback: any) => {
-    return axios.interceptors.response.use(
-        response => response,
-        error => {
-            if (error instanceof AxiosError) {
-                const status = error.response?.status;
-
-                if (status === 401) {
-                    callback();
-                }
-            }
-        }
-    )
-}
