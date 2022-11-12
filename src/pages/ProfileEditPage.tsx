@@ -3,14 +3,15 @@ import { useMutation, useQueryClient } from "react-query";
 import { deleteUser, updateUser } from "../api";
 import Layout from "../components/layout/Layout";
 import Input from "../components/ui/Input";
-import { logout, replaceEmptyInputValue } from "../helpers";
+import { replaceEmptyInputValue } from "../helpers";
 import { useAppDispatch } from "../redux/hooks";
 import { setMessage, show } from "../redux/slices/alertSlice";
 import { EmailValidatorInstance, ERROR } from "../validators";
 import LogoutIcon from "../components/icons/LogoutIcon";
 import Modal from "../components/Modal";
-import { setIsAuth } from "../redux/slices/authSlice";
+import { logOut } from "../redux/slices/authSlice";
 import { NavigateFunction, useNavigate } from "react-router";
+import { AxiosError } from "axios";
 
 const ProfileEditPage = () => {
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -24,15 +25,22 @@ const ProfileEditPage = () => {
             await deleteUser();
             dispatch(show());
             dispatch(setMessage('Successfully deleted an account navigating to login page...'));
-            logout(() => dispatch(setIsAuth(false)));
+            dispatch(logOut())
         } catch (error) {
             dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                setMessage('Seems like your session is expred. Please procceed authentication again');
+                return;
+            }
+
             setMessage('Could not delete the account.');
         }
     }
 
     const onLogoutClick = () => {
-        logout(() => dispatch(setIsAuth(false)))
+        dispatch(logOut())
         dispatch(show());
         dispatch(setMessage('Log out. Navigating to login page...'));
         navigate('/');
@@ -88,8 +96,16 @@ const UpdateUserForm = () => {
             dispatch(show())
             dispatch(setMessage('Successfully updated the account'));
         },
-        onError: () => {
+        onError: (error) => {
             dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                dispatch(setMessage('Seems like your session is expred. Please procceed authentication again'));
+                return;
+            }
+
+
             dispatch(setMessage('Could not update profile information'));
         }
     })

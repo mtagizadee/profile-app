@@ -20,7 +20,7 @@ const App = () => {
 
   useEffect(() => {
     addRequestInterceptors();
-    addResponseInterceptors(() => dispatch(logOut()));
+    // addResponseInterceptors(() => dispatch(logOut()));
     setIsAxiosLoading(false);
   }, []);
 

@@ -1,5 +1,5 @@
 import { createContext, useContext, FC, ReactNode, MouseEvent, useState } from 'react';
-import { isError, useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { API_BASE_URL, createAvatar, updateImage, createHeader, getCurrentUser, deleteImage, createImage, getUser } from '../api';
 import { Image, User } from '../types';
 import { setMessage, show } from '../redux/slices/alertSlice';
@@ -15,6 +15,7 @@ import useHover from '../hooks/useHover';
 import PageLink from '../components/ui/PageLink';
 import { Navigate, useParams } from 'react-router';
 import { AxiosError } from 'axios';
+import { logOut } from '../redux/slices/authSlice';
 
 type TUserContext = {
     user: User | undefined,
@@ -46,12 +47,10 @@ const ProfilePage = () => {
 
 export const OtherUserPage = () => {
     const { id } = useParams();
-    const { data, isLoading, error, isError } = useQuery(['user', id], () => getUser(id as string), {
-        retry: 0
-    });
+    const { data, isLoading, error, isError } = useQuery(['user', id], () => getUser(id as string));
 
     if (isLoading) return <Loader />
-    if ((error instanceof Error && error.name == '404') || isError) {
+    if ((error instanceof AxiosError && error.response?.status == 404) || isError) {
         return <Navigate to='/error' />
     }
 
@@ -81,8 +80,15 @@ const ProfileHeader = () => {
             data?.user?.deleteHeader();
             data?.user?.addImage(variables);
         },
-        onError: () => {
+        onError: (error) => {
             dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                dispatch(setMessage('Seems like your session is expred. Please procceed authentication again'));
+                return;
+            }
+
             dispatch(setMessage('Could not update your header image...'));
         },
     });
@@ -90,8 +96,15 @@ const ProfileHeader = () => {
         onSuccess: variables => {
             data?.user?.addImage(variables);
         },
-        onError: () => {
+        onError: (error) => {
             dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                dispatch(setMessage('Seems like your session is expred. Please procceed authentication again'));
+                return;
+            }
+
             dispatch(setMessage('Could not upload your header image...'));
         }
     })
@@ -139,8 +152,15 @@ const ProfileInfo = () => {
             data?.user?.deleteAvatar()
             data?.user?.addImage(variables);
         },
-        onError: () => {
+        onError: (error) => {
             dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                dispatch(setMessage('Seems like your session is expred. Please procceed authentication again'));
+                return;
+            }
+
             dispatch(setMessage('Could not update profile image'));
         }
     });
@@ -149,8 +169,15 @@ const ProfileInfo = () => {
         onSuccess: variables => {
             data?.user?.addImage(variables);
         },
-        onError: () => {
-            dispatch(show())
+        onError: (error) => {
+            dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                dispatch(setMessage('Seems like your session is expred. Please procceed authentication again'));
+                return;
+            }
+
             dispatch(setMessage('Could not create a profile image'));
         }
     });
@@ -203,8 +230,15 @@ const ProfileImages = () => {
         onSuccess: (variables) => {
             data?.user?.addImage(variables);
         },
-        onError: () => {
+        onError: (error) => {
             dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                dispatch(setMessage('Seems like your session is expred. Please procceed authentication again'));
+                return;
+            }
+
             dispatch(setMessage('Could not create the image...'));
         }
     })
@@ -271,8 +305,16 @@ const ProfileImage: FC<ProfileImageProps> = ({ image }) => {
             data?.user?.deleteImage(image);
             data?.user?.addImage(variables);
         },
-        onError: () => {
+        onError: (error) => {
             dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                dispatch(setMessage('Seems like your session is expred. Please procceed authentication again'));
+                return;
+            }
+
+
             dispatch(setMessage('Could not update the image...'));
         }
     });
@@ -281,8 +323,16 @@ const ProfileImage: FC<ProfileImageProps> = ({ image }) => {
             data?.user?.deleteImage(image);
             setDeleteModal(false);
         },
-        onError: () => {
+        onError: (error) => {
             dispatch(show());
+
+            if (error instanceof AxiosError && error.response?.status == 401) {
+                dispatch(logOut());
+                dispatch(setMessage('Seems like your session is expred. Please procceed authentication again'));
+                return;
+            }
+
+
             dispatch(setMessage('Could not delete the image'));
         }
     });

@@ -33,7 +33,6 @@ const LoginPage = () => {
         } catch (error) {
             if (error instanceof AxiosError) {
                 const status = error.response?.status;
-
                 if (status) {
                     setError(status)
                     return;

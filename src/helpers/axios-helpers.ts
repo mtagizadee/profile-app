@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios"
 import { ACCESS_TOKEN_KEY } from "../api";
 
 export const addRequestInterceptors = () => {
-    axios.interceptors.request.use(
+    return axios.interceptors.request.use(
         config => {
             const token = localStorage.getItem(ACCESS_TOKEN_KEY);
             if (token) {
@@ -12,13 +12,13 @@ export const addRequestInterceptors = () => {
             return config;
         },
         error => {
-            Promise.reject(error)
+            return Promise.reject(error)
         }
     );
 }
 
 export const addResponseInterceptors = (callback: any) => {
-    axios.interceptors.response.use(
+    return axios.interceptors.response.use(
         response => response,
         error => {
             if (error instanceof AxiosError) {
@@ -30,4 +30,4 @@ export const addResponseInterceptors = (callback: any) => {
             }
         }
     )
-} 
+}
