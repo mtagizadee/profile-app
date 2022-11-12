@@ -1,9 +1,12 @@
+import { IUser } from "./user";
+
 export type ImageType = 'header' | 'avatar' | 'image';
 
 export interface IImage {
     id: number;
     url: string;
     type: ImageType;
+    user?: IUser;
 }
 
 export class Image {
@@ -23,5 +26,9 @@ export class Image {
 
     getType() {
         return this.data.type;
+    }
+
+    getUser() {
+        return this.data.user;
     }
 }

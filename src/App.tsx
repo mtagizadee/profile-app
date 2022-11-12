@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "./redux/hooks";
-import { logOut, selectIsAuth, setIsAuth } from "./redux/slices/authSlice";
+import { useAppSelector } from "./redux/hooks";
+import { selectIsAuth } from "./redux/slices/authSlice";
 import AlertMessage from "./components/AlertMessage";
 import { privateRoutes, publicRoutes } from "./routes";
 import ErrorPage from "./pages/ErrorPage";

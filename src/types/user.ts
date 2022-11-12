@@ -18,7 +18,7 @@ export class User {
     };
 
     constructor(data: IUser) {
-        const images = data.images.map(image => new Image(image));
+        const images = data.images.length != 0 ? data.images.map(image => new Image(image)) : [];
         this.data = { ...data, images }
     }
 
